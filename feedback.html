@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Private Feedback | The High 5 Guys</title>
+<meta name="robots" content="noindex">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Private Feedback | The High 5 Guys">
+<link rel="icon" type="image/png" href="/assets/favicon.png">
+<style>
+  html,body{margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:#111;-webkit-font-smoothing:antialiased;
+    background:linear-gradient(155deg,#0b0b0b 0%,#161616 55%,#7a0000 100%) fixed;min-height:100vh}
+  *{box-sizing:border-box}
+  .fb-page{padding:32px 16px 48px}
+  .fb-card{max-width:640px;margin:0 auto;background:#fff;border-radius:22px;padding:34px 30px 24px;box-shadow:0 30px 70px -20px rgba(0,0,0,.6);position:relative;overflow:hidden}
+  .fb-card::before{content:"";position:absolute;top:0;left:0;right:0;height:6px;background:linear-gradient(90deg,#111,#E60000)}
+  .fb-logo{height:72px;display:block;margin:0 auto 6px}
+  .fb-head{font-size:21px;line-height:1.35;font-weight:800;text-align:center;margin:8px 0 6px}
+  .fb-sub{font-size:15px;color:#555B66;text-align:center;margin:0 0 24px;line-height:1.5}
+  .fb-field{margin-bottom:18px}
+  .fb-field label{display:block;font-size:15px;font-weight:600;color:#344054;margin-bottom:8px}
+  .fb-field input,.fb-field textarea{width:100%;font-family:inherit;font-size:16px;color:#000;background:#fff;border:1px solid #D0D5DD;border-radius:8px;padding:10px;outline:none}
+  .fb-field textarea{height:100px;resize:vertical;display:block}
+  .fb-field input:focus,.fb-field textarea:focus{border-color:#E60000}
+  .fb-hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+  .fb-error{display:none;margin:0 0 12px;font-size:14px;color:#B42318}
+  .fb-error.show{display:block}
+  .fb-submit{width:100%;height:50px;border:0;border-radius:12px;background:#E60000;color:#fff;font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 8px 20px -6px rgba(230,0,0,.55)}
+  .fb-submit:disabled{opacity:.6;cursor:default}
+  .fb-public{text-align:center;font-size:11px;line-height:1.4;color:#d3d7de;margin:16px 0 0}
+  .fb-public a{color:#d3d7de;text-decoration:underline}
+  .fb-done{display:none;text-align:center;padding:30px 8px 14px}
+  .fb-done .e{font-size:44px;margin:0}
+  .fb-done .t{font-size:20px;font-weight:800;margin:8px 0 4px}
+  .fb-done .s{font-size:15px;color:#555B66;margin:0}
+  .fb-card.done form{display:none}
+  .fb-card.done .fb-done{display:block}
+  @media(max-width:560px){.fb-card{padding:28px 20px 20px}.fb-head{font-size:19px}}
+</style>
+</head>
+<body>
+<div class="fb-page">
+  <div class="fb-card" id="fbWrap">
+    <img class="fb-logo" src="/assets/logo.png" alt="The High 5 Guys" />
+    <form id="fbForm" novalidate>
+      <h1 class="fb-head">We'd love to learn what we could have done better to earn a higher rating.</h1>
+      <p class="fb-sub">Your note goes straight to our team, and we will personally follow up.</p>
+
+      <div class="fb-field">
+        <label for="full_name">Full Name</label>
+        <input type="text" id="full_name" name="full_name" placeholder="Enter your full name" autocomplete="name" maxlength="160">
+      </div>
+      <div class="fb-field">
+        <label for="email">Email <span>*</span></label>
+        <input type="email" id="email" name="email" placeholder="your@email.com" autocomplete="email" maxlength="254" required>
+      </div>
+      <div class="fb-field">
+        <label for="improve_areas">What areas could we have improved on for your event?</label>
+        <textarea id="improve_areas" name="improve_areas" placeholder="Type your message here" maxlength="4000"></textarea>
+      </div>
+      <div class="fb-field">
+        <label for="team_handled">Is there anything our team could have handled better?</label>
+        <textarea id="team_handled" name="team_handled" placeholder="Type your message here" maxlength="4000"></textarea>
+      </div>
+
+      <div class="fb-hp" aria-hidden="true">
+        <label for="website">Website</label>
+        <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+      </div>
+
+      <p class="fb-error" id="fbError" role="alert"></p>
+      <button type="submit" class="fb-submit" id="fbSubmit">Submit</button>
+      <div class="fb-public">Prefer to post publicly? <a href="https://g.page/r/CU2vLhmq5HtEEAI/review" target="_blank" rel="noopener">Leave a Google review --&gt;</a></div>
+    </form>
+    <div class="fb-done" role="status">
+      <p class="e">🙌</p>
+      <p class="t">We appreciate your feedback!</p>
+      <p class="s">Thank you for taking the time to tell us. We will be in touch.</p>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  var CONFIG = { submitUrl: "https://hub.thehigh5guys.com/api/review-feedback" };
+  var form=document.getElementById('fbForm'), btn=document.getElementById('fbSubmit'),
+      err=document.getElementById('fbError'), wrap=document.getElementById('fbWrap');
+  var rating=null;
+  try{ var r=parseInt(new URLSearchParams(location.search).get('rating'),10); if(r>=1&&r<=5) rating=r; }catch(e){}
+  function fail(msg){ err.textContent=msg; err.classList.add('show'); btn.disabled=false; btn.textContent='Submit'; }
+  form.addEventListener('submit',function(e){
+    e.preventDefault();
+    err.classList.remove('show');
+    var email=form.email.value.trim();
+    if(!email){ fail('Please enter your email.'); form.email.focus(); return; }
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){ fail('Please enter a valid email address.'); form.email.focus(); return; }
+    btn.disabled=true; btn.textContent='Sending…';
+    fetch(CONFIG.submitUrl,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        fullName:form.full_name.value, email:email,
+        improveAreas:form.improve_areas.value, teamHandled:form.team_handled.value,
+        rating:rating, website:form.website.value
+      })
+    }).then(function(res){
+      return res.json().catch(function(){return {}}).then(function(data){
+        if(res.ok && data.ok){ wrap.classList.add('done'); window.scrollTo(0,0); }
+        else fail(data.error || 'We could not send your feedback. Please try again, or call us at (904) 735-5275.');
+      });
+    }).catch(function(){
+      fail('We could not send your feedback. Please try again, or call us at (904) 735-5275.');
+    });
+  });
+})();
+</script>
+</body>
+</html>
